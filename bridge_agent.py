@@ -2,70 +2,70 @@
 import requests
 import os
 
-# CONFIGURACIÓN GLOBAL - SISTEMA CEO-OS
-# Usamos la ruta raíz de la API para que Vercel la encuentre siempre
-API_URL = "https://ceo-os-weld.vercel.app/api"
-CHECK_INTERVAL = 3  # Revisar cada 3 segundos
+# CONFIGURACIÓN DEFINITIVA - SISTEMA CEO-OS
+# Agregamos el / al final para que Vercel no se confunda con las rutas
+API_URL = "https://ceo-os-weld.vercel.app/api/"
+CHECK_INTERVAL = 3  # Segundos entre revisiones
 
 def ejecutar_comando(comando):
     """Procesador de órdenes en tu PC local"""
-    print(f"\n🚀 ORDEN RECIBIDA: {comando}")
+    print(f"\n🚀 ORDEN RECIBIDA DEL CEO: {comando}")
     
     try:
-        # Lógica para crear archivos (Prueba de concepto)
-        if "Crea el archivo" in comando:
-            # Extraer el nombre del archivo del comando
-            partes = comando.split("archivo")
-            nombre = "orden_ceo.txt"
-            if len(partes) > 1:
-                nombre = partes[1].strip().split(" ")[0]
-                if not nombre.endswith(".txt"):
-                    nombre += ".txt"
+        # Lógica: Crear archivos en el escritorio (o carpeta actual)
+        if "Crea el archivo" in comando or "archivo" in comando.lower():
+            # Extraer el nombre del archivo de forma simple
+            nombre = "orden_ceo_os.txt"
+            if "archivo" in comando:
+                partes = comando.split("archivo")
+                nombre = partes[-1].strip().split(" ")[0].replace(".", "") + ".txt"
             
             with open(nombre, "w", encoding="utf-8") as f:
-                f.write(f"Ejecutado por CEO-OS\nComando: {comando}\nFecha: {time.ctime()}")
-            print(f"✅ ÉXITO: Archivo '{nombre}' generado en la carpeta local.")
+                f.write(f"--- SISTEMA CEO-OS ---\nEjecutado correctamente en PC local.\nOrden: {comando}\nFecha: {time.ctime()}")
+            
+            print(f"✅ ÉXITO: Archivo '{nombre}' generado físicamente.")
         
         else:
-            print(f"⚠️ Comando detectado pero sin acción programada: {comando}")
+            print(f"⚠️ Comando detectado: '{comando}'. (Sin acción programada)")
             
     except Exception as e:
-        print(f"❌ Error al ejecutar: {e}")
+        print(f"❌ Error interno al ejecutar comando: {e}")
 
 def iniciar_puente():
     print("------------------------------------------")
     print("📡 SISTEMA ANTIGRAVITY: PUENTE ACTIVO")
     print(f"🔗 Sincronizado con: {API_URL}")
-    print("Presiona Ctrl+C para apagar el sistema.")
+    print("Estado: Esperando señal de Vercel...")
+    print("Presiona Ctrl+C para apagar.")
     print("------------------------------------------")
     
-    ultimo_comando = None
+    ultimo_id_comando = None
     
     while True:
         try:
-            # Petición a la nube
-            response = requests.get(API_URL, timeout=10)
+            # Petición a la API de Vercel
+            response = requests.get(API_URL, timeout=15)
             
             if response.status_code == 200:
                 data = response.json()
                 comando_actual = data.get("comando")
                 
-                # Solo actuar si hay un comando nuevo
-                if comando_actual and comando_actual != ultimo_comando:
+                # Solo ejecutar si hay un comando y es distinto al anterior
+                if comando_actual and comando_actual != ultimo_id_comando:
                     ejecutar_comando(comando_actual)
-                    ultimo_comando = comando_actual
+                    ultimo_id_comando = comando_actual
                 else:
-                    # Indicador visual de que el puente sigue vivo
+                    # Puntitos para saber que el programa no está trabado
                     print(".", end="", flush=True)
             
             elif response.status_code == 404:
-                print("\n🔍 Buscando señal... (Error 404: Vercel aún no activa la API)")
+                print("\n🔍 Buscando señal... (Vercel está despertando la API)")
             else:
-                print(f"\n❌ Estado de API inesperado: {response.status_code}")
+                print(f"\n❌ Error de API ({response.status_code}). Reintentando...")
                 
-        except requests.exceptions.ConnectionError:
-            print("\n📶 Error de conexión: Reintentando en 5 segundos...")
-            time.sleep(2)
+        except requests.exceptions.RequestException:
+            print("\n📶 Error de red: Revisando conexión...")
+            time.sleep(5)
         except Exception as e:
             print(f"\n⚠️ Error imprevisto: {e}")
             

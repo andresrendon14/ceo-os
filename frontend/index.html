@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CEO OS | Los Parceritos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #020617; color: #f8fafc; font-family: 'Geist', sans-serif; }
+        .ceo-border { border: 1px solid rgba(59, 130, 246, 0.2); }
+        .gradient-text { background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-6">
+    <header class="flex justify-between items-center mb-8 ceo-border p-4 rounded-2xl bg-slate-900/50 backdrop-blur-md">
+        <div>
+            <h1 class="text-2xl font-black tracking-tighter gradient-text">LOS PARCERITOS</h1>
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Asistente Personal del CEO</p>
+        </div>
+        <div class="text-right">
+            <p class="text-xs font-mono text-blue-400">asistente-ceo.losparceritos.com</p>
+            <div class="flex items-center gap-2 justify-end mt-1">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] text-green-400 font-bold">CORE ONLINE</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow overflow-y-auto space-y-4 mb-6 pr-2 custom-scrollbar" id="chat">
+        <div class="bg-slate-900/80 p-5 rounded-2xl ceo-border max-w-2xl">
+            <p class="text-xs text-blue-400 font-bold mb-1 italic">SISTEMA v1.0:</p>
+            <p class="text-sm leading-relaxed">Andrés, el sistema operativo está listo. El subdominio está enlazado y el hilo conductor del Roadmap está cargado. ¿Qué estrategia ejecutamos ahora?</p>
+        </div>
+    </main>
+
+    <footer class="relative mt-auto">
+        <input type="text" id="cmd" placeholder="Comando para el Asistente..." 
+               class="w-full bg-slate-900 ceo-border rounded-2xl p-5 outline-none focus:ring-2 ring-blue-500/50 transition-all text-sm pr-20">
+        <button onclick="ejecutar()" class="absolute right-3 top-2 bottom-2 bg-blue-600 hover:bg-blue-500 px-4 rounded-xl text-xs font-bold transition-all">EJECUTAR</button>
+    </footer>
+
+    <script>
+        function ejecutar() {
+            const input = document.getElementById('cmd');
+            const chat = document.getElementById('chat');
+            if (!input.value) return;
+            
+            chat.innerHTML += \<div class="flex flex-col items-end"><div class="bg-blue-600/20 ceo-border p-4 rounded-2xl max-w-xl"><p class="text-xs text-blue-300 font-bold mb-1 uppercase">CEO Andrés:</p><p class="text-sm">\</p></div></div>\;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>

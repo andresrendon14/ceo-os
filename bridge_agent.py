@@ -3,35 +3,54 @@ import time
 import requests
 import subprocess
 
-# Configuración
+# Configuración: Tu URL de Vercel
 API_URL = "https://asistente-ceo.losparceritos.com/api/comandos"
-LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def ejecutar_comando_openclaw(instruccion):
-    print(f"🛠️ Ejecutando instrucción de Andrés: {instruccion}")
+    print(f"\n[CEO ORDER]: {instruccion}")
+    print("🛠️ Ejecutando con OpenClaw...")
     try:
-        # Ejecutar OpenClaw
-        subprocess.run(["openclaw", instruccion], shell=True)
-        print("✅ Operación local completada.")
+        # 1. Ejecutar la lógica de programación (Simulado o Real)
+        # Nota: Asegúrate de tener openclaw instalado o cambia este comando por tu lógica
+        subprocess.run(f"echo '{instruccion}' > ULTIMA_ORDEN.txt", shell=True) 
         
-        # Sincronizar cambios a GitHub para que Vercel se actualice
-        print("🔄 Sincronizando con la nube...")
-        subprocess.run(["git", "add", "."], shell=True)
-        subprocess.run(["git", "commit", "-m", f"Auto-build: {instruccion[:30]}"], shell=True)
-        subprocess.run(["git", "push", "origin", "main"], shell=True)
+        print("✅ Archivo local generado.")
+        
+        # 2. Auto-Sincronización (Push automático a la web)
+        print("🔄 Subiendo cambios a Vercel...")
+        subprocess.run("git add .", shell=True)
+        subprocess.run(f'git commit -m "Auto-build: {instruccion[:20]}"', shell=True)
+        subprocess.run("git push origin main", shell=True)
+        print("🚀 ¡Cambio en vivo en asistente-ceo.losparceritos.com!")
         return True
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ Error de ejecución: {e}")
         return False
 
 if __name__ == "__main__":
-    print("📡 PUENTE ANTIGRAVITY ACTIVO")
-    print("Esperando órdenes desde asistente-ceo.losparceritos.com...")
-    
-    # Por ahora, para la PRUEBA DE FUEGO, vamos a simular una espera activa
-    # En la siguiente fase, este loop consultará tu API de Vercel
+    print("📡 PUENTE ANTIGRAVITY SINCRONIZADO")
+    print(f"🔗 Escuchando a: {API_URL}")
+    print("Presiona Ctrl+C para detener.")
+
     while True:
         try:
+            # Preguntar a la API si hay algo nuevo
+            response = requests.get(API_URL)
+            if response.status_code == 200:
+                data = response.json()
+                comando = data.get("comando")
+                
+                if comando:
+                    ejecutar_comando_openclaw(comando)
+                else:
+                    # No hay órdenes, esperamos un poco
+                    print(".", end="", flush=True) 
+            else:
+                print(f"\n⚠️ Error de conexión API: {response.status_code}")
+            
+            time.sleep(5) # Revisar cada 5 segundos
+        except Exception as e:
+            print(f"\n❌ Error en el loop: {e}")
             time.sleep(10)
         except KeyboardInterrupt:
             print("\n🛑 Puente cerrado por el CEO.")

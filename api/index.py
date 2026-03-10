@@ -1,15 +1,11 @@
 ﻿from fastapi import FastAPI
 app = FastAPI()
 
-# Guardamos el comando en memoria
-db = {"comando": "Sistema Iniciado"}
+# Memoria temporal para el comando
+db = {"comando": "Sistema Reiniciado"}
 
 @app.get("/api")
 def root():
-    return db
-
-@app.get("/api/comandos")
-def get_cmd():
     return db
 
 @app.post("/api/enviar")

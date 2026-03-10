@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -11,14 +11,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Cubrimos todas las rutas posibles
-@app.get("/")
+# Misma ruta para LEER
 @app.get("/api")
 def leer_comando():
     return db
 
-@app.post("/enviar")
-@app.post("/api/enviar")
+# Misma ruta exacta para ENVIAR (Vercel no podr? dar 404)
+@app.post("/api")
 async def recibir_comando(data: dict):
-    db["comando"] = data.get("comando", "Comando vacío")
+    db["comando"] = data.get("comando", "Comando vac?o")
     return {"status": "ok"}

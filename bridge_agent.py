@@ -1,75 +1,43 @@
 ﻿import time
 import requests
-import os
+from datetime import datetime
 
-# CONFIGURACIÓN DEFINITIVA - SISTEMA CEO-OS
-# Agregamos el / al final para que Vercel no se confunda con las rutas
-API_URL = "https://ceo-os-weld.vercel.app/api/"
-CHECK_INTERVAL = 3  # Segundos entre revisiones
+# 🎯 LA CLAVE: URL de Producción pura (Libre del bloqueo de Preview)
+API_URL = "https://ceo-os-weld.vercel.app/api"
 
-def ejecutar_comando(comando):
-    """Procesador de órdenes en tu PC local"""
-    print(f"\n🚀 ORDEN RECIBIDA DEL CEO: {comando}")
-    
+def ejecutar_orden(cmd):
+    hora = datetime.now().strftime('%H:%M:%S')
+    print(f"\n[{hora}] ⚡ ORDEN MAESTRA EJECUTADA: {cmd}")
     try:
-        # Lógica: Crear archivos en el escritorio (o carpeta actual)
-        if "Crea el archivo" in comando or "archivo" in comando.lower():
-            # Extraer el nombre del archivo de forma simple
-            nombre = "orden_ceo_os.txt"
-            if "archivo" in comando:
-                partes = comando.split("archivo")
-                nombre = partes[-1].strip().split(" ")[0].replace(".", "") + ".txt"
-            
-            with open(nombre, "w", encoding="utf-8") as f:
-                f.write(f"--- SISTEMA CEO-OS ---\nEjecutado correctamente en PC local.\nOrden: {comando}\nFecha: {time.ctime()}")
-            
-            print(f"✅ ÉXITO: Archivo '{nombre}' generado físicamente.")
-        
-        else:
-            print(f"⚠️ Comando detectado: '{comando}'. (Sin acción programada)")
-            
+        with open("NUCLEO_CEO.txt", "w", encoding="utf-8") as f:
+            f.write(f"SISTEMA OPENCLAW\nÚltima orden: {cmd}\nHora: {hora}")
     except Exception as e:
-        print(f"❌ Error interno al ejecutar comando: {e}")
+        print(f"Error local: {e}")
 
 def iniciar_puente():
-    print("------------------------------------------")
-    print("📡 SISTEMA ANTIGRAVITY: PUENTE ACTIVO")
-    print(f"🔗 Sincronizado con: {API_URL}")
-    print("Estado: Esperando señal de Vercel...")
-    print("Presiona Ctrl+C para apagar.")
-    print("------------------------------------------")
+    print("="*55)
+    print("🧠 SISTEMA OPENCLAW ACTIVADO - NIVEL DOCTORADO")
+    print(f"🔗 Conectado a Producción Frontal: {API_URL}")
+    print("="*55)
     
-    ultimo_id_comando = None
-    
+    ultimo = None
     while True:
         try:
-            # Petición a la API de Vercel
-            response = requests.get(API_URL, timeout=15)
-            
-            if response.status_code == 200:
-                data = response.json()
-                comando_actual = data.get("comando")
-                
-                # Solo ejecutar si hay un comando y es distinto al anterior
-                if comando_actual and comando_actual != ultimo_id_comando:
-                    ejecutar_comando(comando_actual)
-                    ultimo_id_comando = comando_actual
+            res = requests.get(API_URL, timeout=10)
+            if res.status_code == 200:
+                cmd = res.json().get("comando")
+                if cmd and cmd != ultimo:
+                    ejecutar_orden(cmd)
+                    ultimo = cmd
                 else:
-                    # Puntitos para saber que el programa no está trabado
                     print(".", end="", flush=True)
-            
-            elif response.status_code == 404:
-                print("\n🔍 Buscando señal... (Vercel está despertando la API)")
+            elif res.status_code == 404:
+                print("\n🔄 Esperando a que Vercel termine de compilar (404)...")
             else:
-                print(f"\n❌ Error de API ({response.status_code}). Reintentando...")
-                
-        except requests.exceptions.RequestException:
-            print("\n📶 Error de red: Revisando conexión...")
-            time.sleep(5)
-        except Exception as e:
-            print(f"\n⚠️ Error imprevisto: {e}")
-            
-        time.sleep(CHECK_INTERVAL)
+                print(f"\n⚠️ Ignorando ruido de red (Código {res.status_code})...")
+        except:
+            print("\n📶 Reconectando al servidor central...", end="")
+        time.sleep(3)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     iniciar_puente()

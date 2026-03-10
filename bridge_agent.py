@@ -1,57 +1,75 @@
-﻿import os
-import time
+﻿import time
 import requests
-import subprocess
+import os
 
-# Configuración: Tu URL de Vercel
-API_URL = "https://asistente-ceo.losparceritos.com/api/comandos"
+# CONFIGURACIÓN GLOBAL - SISTEMA CEO-OS
+# Usamos la ruta raíz de la API para que Vercel la encuentre siempre
+API_URL = "https://ceo-os-weld.vercel.app/api"
+CHECK_INTERVAL = 3  # Revisar cada 3 segundos
 
-def ejecutar_comando_openclaw(instruccion):
-    print(f"\n[CEO ORDER]: {instruccion}")
-    print("🛠️ Ejecutando con OpenClaw...")
+def ejecutar_comando(comando):
+    """Procesador de órdenes en tu PC local"""
+    print(f"\n🚀 ORDEN RECIBIDA: {comando}")
+    
     try:
-        # 1. Ejecutar la lógica de programación (Simulado o Real)
-        # Nota: Asegúrate de tener openclaw instalado o cambia este comando por tu lógica
-        subprocess.run(f"echo '{instruccion}' > ULTIMA_ORDEN.txt", shell=True) 
+        # Lógica para crear archivos (Prueba de concepto)
+        if "Crea el archivo" in comando:
+            # Extraer el nombre del archivo del comando
+            partes = comando.split("archivo")
+            nombre = "orden_ceo.txt"
+            if len(partes) > 1:
+                nombre = partes[1].strip().split(" ")[0]
+                if not nombre.endswith(".txt"):
+                    nombre += ".txt"
+            
+            with open(nombre, "w", encoding="utf-8") as f:
+                f.write(f"Ejecutado por CEO-OS\nComando: {comando}\nFecha: {time.ctime()}")
+            print(f"✅ ÉXITO: Archivo '{nombre}' generado en la carpeta local.")
         
-        print("✅ Archivo local generado.")
-        
-        # 2. Auto-Sincronización (Push automático a la web)
-        print("🔄 Subiendo cambios a Vercel...")
-        subprocess.run("git add .", shell=True)
-        subprocess.run(f'git commit -m "Auto-build: {instruccion[:20]}"', shell=True)
-        subprocess.run("git push origin main", shell=True)
-        print("🚀 ¡Cambio en vivo en asistente-ceo.losparceritos.com!")
-        return True
+        else:
+            print(f"⚠️ Comando detectado pero sin acción programada: {comando}")
+            
     except Exception as e:
-        print(f"❌ Error de ejecución: {e}")
-        return False
+        print(f"❌ Error al ejecutar: {e}")
 
-if __name__ == "__main__":
-    print("📡 PUENTE ANTIGRAVITY SINCRONIZADO")
-    print(f"🔗 Escuchando a: {API_URL}")
-    print("Presiona Ctrl+C para detener.")
-
+def iniciar_puente():
+    print("------------------------------------------")
+    print("📡 SISTEMA ANTIGRAVITY: PUENTE ACTIVO")
+    print(f"🔗 Sincronizado con: {API_URL}")
+    print("Presiona Ctrl+C para apagar el sistema.")
+    print("------------------------------------------")
+    
+    ultimo_comando = None
+    
     while True:
         try:
-            # Preguntar a la API si hay algo nuevo
-            response = requests.get(API_URL)
+            # Petición a la nube
+            response = requests.get(API_URL, timeout=10)
+            
             if response.status_code == 200:
                 data = response.json()
-                comando = data.get("comando")
+                comando_actual = data.get("comando")
                 
-                if comando:
-                    ejecutar_comando_openclaw(comando)
+                # Solo actuar si hay un comando nuevo
+                if comando_actual and comando_actual != ultimo_comando:
+                    ejecutar_comando(comando_actual)
+                    ultimo_comando = comando_actual
                 else:
-                    # No hay órdenes, esperamos un poco
-                    print(".", end="", flush=True) 
-            else:
-                print(f"\n⚠️ Error de conexión API: {response.status_code}")
+                    # Indicador visual de que el puente sigue vivo
+                    print(".", end="", flush=True)
             
-            time.sleep(5) # Revisar cada 5 segundos
+            elif response.status_code == 404:
+                print("\n🔍 Buscando señal... (Error 404: Vercel aún no activa la API)")
+            else:
+                print(f"\n❌ Estado de API inesperado: {response.status_code}")
+                
+        except requests.exceptions.ConnectionError:
+            print("\n📶 Error de conexión: Reintentando en 5 segundos...")
+            time.sleep(2)
         except Exception as e:
-            print(f"\n❌ Error en el loop: {e}")
-            time.sleep(10)
-        except KeyboardInterrupt:
-            print("\n🛑 Puente cerrado por el CEO.")
-            break
+            print(f"\n⚠️ Error imprevisto: {e}")
+            
+        time.sleep(CHECK_INTERVAL)
+
+if __name__ == "__main__":
+    iniciar_puente()

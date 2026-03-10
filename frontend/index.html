@@ -8,14 +8,10 @@
     <style>
         body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; overflow: hidden; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(59, 130, 246, 0.2); }
-        .terminal-text { font-family: 'Fira Code', monospace; font-size: 0.85rem; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
 <body class="h-screen flex flex-col p-4">
-
     <header class="flex justify-between items-center mb-4 glass p-4 rounded-xl">
         <div class="flex items-center gap-4">
             <div class="p-2 bg-blue-600 rounded-lg"><i class="fas fa-rocket text-white"></i></div>
@@ -26,80 +22,50 @@
         </div>
         <div class="flex gap-6 text-xs font-medium">
             <div class="flex flex-col items-end">
-                <span class="text-slate-500">FASE ACTUAL</span>
-                <span class="text-blue-400">01: ESTRUCTURACIÓN</span>
-            </div>
-            <div class="flex flex-col items-end">
                 <span class="text-slate-500">OPENCLAW</span>
                 <span class="text-green-400"><span class="status-dot bg-green-500 animate-pulse mr-1"></span>READY</span>
             </div>
         </div>
     </header>
 
-    <div class="flex flex-grow gap-4 overflow-hidden">
-        
-        <aside class="w-1/4 glass rounded-xl p-4 flex flex-col gap-4">
-            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Roadmap del Proyecto</h2>
-            <div class="space-y-3 overflow-y-auto">
-                <div class="p-3 bg-blue-600/10 border border-blue-500/30 rounded-lg">
-                    <p class="text-xs font-bold text-blue-400">01. CEREBRO & CLOUD</p>
-                    <p class="text-[10px] text-slate-300">GitHub Sync & Vercel Deploy</p>
-                    <div class="w-full bg-slate-700 h-1 mt-2 rounded-full"><div class="bg-blue-500 h-1 w-full rounded-full"></div></div>
-                </div>
-                <div class="p-3 bg-slate-800/50 rounded-lg">
-                    <p class="text-xs font-bold text-slate-400">02. DISEÑO & BRANDING</p>
-                    <p class="text-[10px] text-slate-500">Manual de Marca & UI Assets</p>
-                </div>
-                <div class="p-3 bg-slate-800/50 rounded-lg">
-                    <p class="text-xs font-bold text-slate-400">03. IMPLEMENTACIÓN WEB</p>
-                    <p class="text-[10px] text-slate-500">Core de la App LosParceritos.com</p>
+    <main class="flex-grow flex flex-col gap-4 overflow-hidden">
+        <div class="flex-grow glass rounded-xl p-6 overflow-y-auto space-y-4" id="chat-box">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs">AI</div>
+                <div class="bg-slate-800/50 p-4 rounded-2xl rounded-tl-none max-w-xl text-sm">
+                    Andrés, sistema de puente activado. Escribe una orden técnica para que OpenClaw la ejecute en tu PC.
                 </div>
             </div>
-            
-            <div class="mt-auto p-3 glass rounded-lg border-yellow-500/20 bg-yellow-500/5">
-                <p class="text-[10px] text-yellow-500 font-bold mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> TAREA PENDIENTE</p>
-                <p class="text-xs text-slate-300 italic">"Configurar el enlace de OpenClaw con el sistema de archivos local."</p>
-            </div>
-        </aside>
+        </div>
 
-        <main class="flex-grow flex flex-col gap-4">
-            <div class="flex-grow glass rounded-xl p-6 overflow-y-auto space-y-4" id="chat-box">
-                <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs">AI</div>
-                    <div class="bg-slate-800/50 p-4 rounded-2xl rounded-tl-none max-w-xl">
-                        <p class="text-sm leading-relaxed text-slate-200">
-                            Andrés, el panel de control está sincronizado con <b>asistente-ceo.losparceritos.com</b>. 
-                            Estoy listo para que <b>OpenClaw</b> empiece a programar los componentes del sitio. ¿Qué módulo diseñamos primero?
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass p-2 rounded-2xl flex items-center gap-3">
-                <div class="pl-4 text-blue-500"><i class="fas fa-terminal text-sm"></i></div>
-                <input type="text" id="cmd-input" placeholder="Comando para Antigravity (Ej: 'Crea el componente de login')..." 
-                       class="bg-transparent flex-grow p-4 outline-none text-sm font-medium">
-                <button onclick="sendCommand()" class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-xl font-bold text-xs transition-all tracking-widest">EJECUTAR</button>
-            </div>
-        </main>
-    </div>
+        <div class="glass p-2 rounded-2xl flex items-center gap-3">
+            <div class="pl-4 text-blue-500"><i class="fas fa-terminal text-sm"></i></div>
+            <input type="text" id="cmd-input" placeholder="Ej: Crea un archivo contacto.html..." class="bg-transparent flex-grow p-4 outline-none text-sm font-medium">
+            <button onclick="sendCommand()" class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-xl font-bold text-xs transition-all tracking-widest">EJECUTAR</button>
+        </div>
+    </main>
 
     <script>
-        function sendCommand() {
+        async function sendCommand() {
             const input = document.getElementById('cmd-input');
             const chat = document.getElementById('chat-box');
-            if(!input.value) return;
+            const val = input.value;
+            if(!val) return;
 
-            chat.innerHTML += \
-                <div class="flex gap-3 justify-end">
-                    <div class="bg-blue-600/20 border border-blue-500/30 p-4 rounded-2xl rounded-tr-none max-w-xl text-right">
-                        <p class="text-[10px] text-blue-400 font-bold mb-1 uppercase tracking-widest">CEO Andrés</p>
-                        <p class="text-sm leading-relaxed text-blue-100 uppercase font-mono">\</p>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs">AR</div>
-                </div>\;
-            
+            chat.innerHTML += \<div class="flex gap-3 justify-end"><div class="bg-blue-600/20 border border-blue-500/30 p-4 rounded-2xl max-w-xl text-right text-sm text-blue-100 uppercase font-mono">\</div></div>\;
             input.value = '';
+
+            try {
+                const response = await fetch('/api/enviar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({instruccion: val})
+                });
+                const data = await response.json();
+                console.log('API Response:', data);
+            } catch (e) {
+                console.error('Error enviando a la API:', e);
+            }
             chat.scrollTop = chat.scrollHeight;
         }
     </script>

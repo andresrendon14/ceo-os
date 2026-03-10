@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -33,7 +33,7 @@
             <div class="flex gap-3">
                 <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs">AI</div>
                 <div class="bg-slate-800/50 p-4 rounded-2xl rounded-tl-none max-w-xl text-sm">
-                    AndrÃ©s, sistema de puente activado. Escribe una orden tÃ©cnica para que OpenClaw la ejecute en tu PC.
+                    Andrés, sistema de puente activado. Escribe una orden técnica para que OpenClaw la ejecute en tu PC.
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
             input.value = '';
 
             try {
-                const response = await fetch('/api/enviar', {
+                const response = await fetch('https://ceo-os-weld.vercel.app/api/enviar', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({instruccion: val})
